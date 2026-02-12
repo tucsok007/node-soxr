@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>C:\Users\clioo\Documents\Code\node-soxr\src\</FILEPATH>
+      <FILENAME>wrapper.cc</FILENAME>
+      <LINE>42</LINE>
+      <COLUMN>25</COLUMN>
+    </SFA>
+    <DEFECTCODE>6398</DEFECTCODE>
+    <DESCRIPTION>The address-of a field cannot be null in well-defined code.</DESCRIPTION>
+    <FUNCTION>SoxrWrapper::{dtor}</FUNCTION>
+    <DECORATED>??1SoxrWrapper@@UEAA@XZ</DECORATED>
+    <FUNCLINE>41</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>

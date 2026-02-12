@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DEFECTS>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>C:\Users\clioo\Documents\Code\node-soxr\soxr\src\</FILEPATH>
+      <FILENAME>fifo.h</FILENAME>
+      <LINE>62</LINE>
+      <COLUMN>14</COLUMN>
+    </SFA>
+    <DEFECTCODE>6308</DEFECTCODE>
+    <DESCRIPTION>'realloc' might return null pointer: assigning null pointer to 'f-&gt;data', which is passed as an argument to 'realloc', will cause the original memory block to be leaked.</DESCRIPTION>
+    <FUNCTION>fifo_reserve</FUNCTION>
+    <DECORATED>fifo_reserve</DECORATED>
+    <FUNCLINE>41</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>C:\Users\clioo\Documents\Code\node-soxr\soxr\src\</FILEPATH>
+      <FILENAME>cr.c</FILENAME>
+      <LINE>357</LINE>
+      <COLUMN>37</COLUMN>
+    </SFA>
+    <DEFECTCODE>6297</DEFECTCODE>
+    <DESCRIPTION>Arithmetic overflow.  Results might not be an expected value.</DESCRIPTION>
+    <FUNCTION>_soxr_init</FUNCTION>
+    <DECORATED>_soxr_init</DECORATED>
+    <FUNCLINE>264</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>C:\Users\clioo\Documents\Code\node-soxr\soxr\src\</FILEPATH>
+      <FILENAME>cr.c</FILENAME>
+      <LINE>336</LINE>
+      <COLUMN>46</COLUMN>
+    </SFA>
+    <DEFECTCODE>6323</DEFECTCODE>
+    <DESCRIPTION>Use of arithmetic operator on Boolean type(s).</DESCRIPTION>
+    <FUNCTION>_soxr_init</FUNCTION>
+    <DECORATED>_soxr_init</DECORATED>
+    <FUNCLINE>264</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>C:\Users\clioo\Documents\Code\node-soxr\soxr\src\</FILEPATH>
+      <FILENAME>cr.c</FILENAME>
+      <LINE>336</LINE>
+      <COLUMN>66</COLUMN>
+    </SFA>
+    <DEFECTCODE>6323</DEFECTCODE>
+    <DESCRIPTION>Use of arithmetic operator on Boolean type(s).</DESCRIPTION>
+    <FUNCTION>_soxr_init</FUNCTION>
+    <DECORATED>_soxr_init</DECORATED>
+    <FUNCLINE>264</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+  <DEFECT>
+    <SFA>
+      <FILEPATH>C:\Users\clioo\Documents\Code\node-soxr\soxr\src\</FILEPATH>
+      <FILENAME>cr.c</FILENAME>
+      <LINE>400</LINE>
+      <COLUMN>55</COLUMN>
+    </SFA>
+    <DEFECTCODE>6323</DEFECTCODE>
+    <DESCRIPTION>Use of arithmetic operator on Boolean type(s).</DESCRIPTION>
+    <FUNCTION>_soxr_init</FUNCTION>
+    <DECORATED>_soxr_init</DECORATED>
+    <FUNCLINE>264</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT>
+</DEFECTS>
