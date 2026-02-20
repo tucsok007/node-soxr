@@ -13,9 +13,11 @@
     "README.md"
   ],
   "scripts": {
+    "install": "node-pre-gyp install --fallback-to-build",
     "configure": "node-gyp configure",
-    "build": "node-gyp confiugure build",
-    "refresh-deps": "rm -rf build node_modules && npm i"
+    "build": "./build.sh",
+    "gyp:build": "node-gyp confiugure build",
+    "gyp:refresh-deps": "rm -rf build node_modules && npm i"
   },
   "gypfile": true,
   "author": "Clio Orgyán",
@@ -29,5 +31,12 @@
     "@types/node": "^25.2.2",
     "node-web-audio-api": "^1.0.7",
     "typescript": "^5.9.3"
+  },
+  "binary": {
+    "module_name": "node-soxr",
+    "module_path": "./lib/binding/{configuration}/{node_abi}-{platform}-{arch}-{libc}/",
+    "remote_path": "./{module_name}/v{version}/{configuration}/",
+    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}-{libc}.tar.gz",
+    "host": "https://registry.unravel.hu"
   }
 }

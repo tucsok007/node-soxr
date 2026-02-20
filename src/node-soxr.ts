@@ -1,4 +1,9 @@
-const NodeSoxr = require("../build/Release/node-soxr.node");
+const nodePreGyp = require("@mapbox/node-pre-gyp");
+const path = require("path");
+const bindingPath = nodePreGyp.find(
+  path.resolve(path.join(__dirname, "../package.json")),
+);
+const NodeSoxr = require(bindingPath);
 
 interface SoxrWrapper {
   /** Resamples the provided interleaved channel data with the resampler.

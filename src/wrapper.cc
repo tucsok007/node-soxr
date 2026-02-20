@@ -39,9 +39,7 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
 };
 
 SoxrWrapper::~SoxrWrapper() {
-  if(&this->soxrInstance != NULL) {
-    soxr_delete(this->soxrInstance);
-  }
+  soxr_delete(this->soxrInstance);
 }
 
 Napi::Object SoxrWrapper::init(Napi::Env env, Napi::Object exports) {

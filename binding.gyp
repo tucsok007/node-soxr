@@ -8,20 +8,17 @@
           'soxr/src/cr32.c',
           'soxr/src/cr32s.c',
           'soxr/src/cr64.c',
-          'soxr/src/cr64s.c',
           'soxr/src/data-io.c',
           'soxr/src/dbesi0.c',
           'soxr/src/fft4g32.c',
           'soxr/src/fft4g64.c',
           'soxr/src/filter.c',
           'soxr/src/pffft32s.c',
-          'soxr/src/pffft64s.c',
           'soxr/src/util32s.c',
-          'soxr/src/util64s.c',
           'soxr/src/soxr.c',
           'soxr/src/vr32.c',
         ],
-      'include_dirs': ['soxr/msvc', 'soxr/src'],
+      'include_dirs': ['soxr/config', 'soxr/src'],
       'dependencies': ["<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except_all"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
@@ -42,6 +39,17 @@
           }
         }]
       ]
+    },
+    {
+        "target_name": "action-after-build",
+        "type": "none",
+        "dependencies": ["<(module_name)"],
+        "copies": [
+            {
+                "files": ["<(PRODUCT_DIR)/<(module_name).node"],
+                "destination": "<(module_path)"
+            }
+        ]
     }
   ]
 }

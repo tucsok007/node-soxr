@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deinterleaveChannelData = exports.interleaveChannelData = exports.soxrCleanup = exports.SoxrWrapper = exports.SoxrQuality = void 0;
-const NodeSoxr = require("../build/Release/node-soxr.node");
+const nodePreGyp = require("@mapbox/node-pre-gyp");
+const path = require("path");
+const bindingPath = nodePreGyp.find(path.resolve(path.join(__dirname, "../package.json")));
+const NodeSoxr = require(bindingPath);
 var SoxrQuality;
 (function (SoxrQuality) {
     /** 'Quick' qubic interpolation. */
