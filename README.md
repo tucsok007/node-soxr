@@ -8,21 +8,18 @@ Node.js native addon wrapper for libsoxr (high quality and high performance offl
 
 #### Requirements:
 
-- Node.js >= 24 (Binaries are built on LTS node. Please rebuild from source manually if you want a different node target.)
+- npm
+- Node.js >= 24 (Binaries are built on LTS node. Please rebuild from source manually if you want to target older node versions.)
 
 #### Setup:
 
-Right now only manual setup is supported. Please see build for pre-built windows binaries and dist for the JavaScript & TypeScript lib. (ESM supported.)
-
-1. (Optional) build the binaries on your target system (or cross-compile with [node-gyp](https://github.com/nodejs/node-gyp)):
+1. Install with npm:
 
    ```sh
-   npm i && npm run build
+   npm i node-soxr
    ```
 
-2. Copy the dist and build folders to your project (make sure they are at the same level in the hierarchy).
-
-3. Import the library from dist/node-soxr.
+   **_Note: the npm package includes pre-built binaries for Linux (incl. builds for all architectures supported by LTS Node.js), Alipne containers (all Node.js LTS supported architectures), and Windows (x64 only). For different operating systems and architectures (ex. darwin - MacOS) please make sure to install the necessary build tools on your system so the corresponding binaries can be built on your system at install time. If the required build tools are missing install will fail._**
 
 ## Usage:
 
@@ -36,6 +33,14 @@ const resampledData = soxr.resample(data);
 [You can find an in depth example here regarding how you can utilize the library in a real-world scenario.](examples/example.ts)
 
 ###### At the moment only CBR resampling is supported. (This might not change.)
+
+## Contributions:
+
+The C++ standard used for this project is C++ 17.
+
+All contributions are welcome. In order to contribute, please make a fork of this project and make a pull request to the main branch of this project once you added your changes.
+
+Please make sure to use the same major and minor versions as the corresponding SoxR version - this way users can easily understand which SoxR version is embedded in this wrapper. (Use the patch version for changes to the same minor version.)
 
 ## Licensing/Credits:
 

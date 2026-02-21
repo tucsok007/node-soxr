@@ -20,8 +20,9 @@
         ],
       'include_dirs': ['soxr/config', 'soxr/src'],
       'dependencies': ["<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except_all"],
-      'cflags!': [ '-fno-exceptions' ],
+      'cflags!': [ '-fno-exceptions'],
       'cflags_cc!': [ '-fno-exceptions' ],
+      'cflags': ['-Wno-error=implicit-function-declaration'],
       'xcode_settings': {
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'CLANG_CXX_LIBRARY': 'libc++',
@@ -39,17 +40,6 @@
           }
         }]
       ]
-    },
-    {
-        "target_name": "action-after-build",
-        "type": "none",
-        "dependencies": ["<(module_name)"],
-        "copies": [
-            {
-                "files": ["<(PRODUCT_DIR)/<(module_name).node"],
-                "destination": "<(module_path)"
-            }
-        ]
     }
   ]
 }
