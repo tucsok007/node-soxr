@@ -1,5 +1,4 @@
 #include "napi.h"
-#include <optional>
 #include "../soxr/src/soxr.h"
 #include "wrapper.h"
 
@@ -67,8 +66,9 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   std::vector<float> inputVector(inputLength);
   size_t inputDone;
 
-  size_t outputLength = static_cast<size_t>(inputLength * this->outputSampleRate / this->inputSampleRate + 0.5);
+  //size_t outputLength = static_cast<size_t>(inputLength * this->outputSampleRate / this->inputSampleRate + 0.5);
   size_t outputFrames = static_cast<size_t>(inputFrames * this->outputSampleRate / this->inputSampleRate + 0.5);
+  size_t outputLength = static_cast<size_t>(outputFrames * this->numberOfChannels);
   Napi::Float32Array output = Napi::Float32Array::New(env, outputLength);
   std::vector<float> outputVector(outputLength);
   size_t outputDone;
@@ -80,6 +80,11 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   }
 
   error = soxr_process(this->soxrInstance, inputVector.data(), inputFrames, &inputDone, outputVector.data(), outputFrames, &outputDone);
+
+  //Flush remaining samples
+  if(outputDone < outputFrames) {
+    error = soxr_process(this->soxrInstance, NULL, 0, NULL, outputVector.data()+outputDone*this->numberOfChannels, outputFrames, NULL);
+  }
 
   for(int index = 0; index < outputLength; index++) {
     output[index] = outputVector[index];

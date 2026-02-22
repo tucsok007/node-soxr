@@ -3,7 +3,7 @@ import {
   interleaveChannelData,
   SoxrQuality,
   SoxrWrapper,
-} from "../dist/node-soxr";
+} from "../node-soxr";
 import { createReadStream, ReadStream } from "node:fs";
 import { AudioContext } from "node-web-audio-api";
 import { arrayBuffer } from "node:stream/consumers";
