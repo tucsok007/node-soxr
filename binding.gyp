@@ -22,19 +22,20 @@
       'dependencies': ["<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except_all"],
       'cflags!': [ '-fno-exceptions'],
       'cflags_cc!': [ '-fno-exceptions' ],
-      'cflags': ['-Wno-error=implicit-function-declaration'],
+      'cflags+': ['-Wno-error=implicit-function-declaration', '-fopenmp', '-pthread'],
+      'cflags_cc+': ['-fopenmp', '-pthread'],
       'xcode_settings': {
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'CLANG_CXX_LIBRARY': 'libc++',
         'MACOSX_DEPLOYMENT_TARGET': '10.7'
       },
       'msvs_settings': {
-        'VCCLCompilerTool': { 'ExceptionHandling': 1 },
+        'VCCLCompilerTool': { 'ExceptionHandling': 1, 'AdditionalOptions' : ['/MT','/openmp:llvm'] },
       },
-      'defines': ['SOXR_LIB', 'WITH_OPENMP'],
+      'defines': ['SOXR_LIB', '_OPENMP'],
       'conditions': [
         ['OS=="mac"', {
-          'cflags+': ['-fvisibility=hidden'],
+          'cflags+': ['-fvisibility=hidden', '-Xpreprocessor'],
           'xcode_settings': {
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
           }

@@ -1,8 +1,17 @@
-#include "napi.h"
+#include <napi.h>
+#include <omp.h>
 #include "../soxr/src/soxr.h"
 #include "wrapper.h"
+#include "utils.cc"
 
 SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<SoxrWrapper>(info) {
+  Napi::Env env = info.Env();
+
+  if(info.Length() < 3) {
+    Napi::TypeError::New(env, "The first 3 parameters (inputSampleRate, outputSampleRate, numberOfChannels) must be provided.").ThrowAsJavaScriptException();
+    return;
+  }
+
   double inputSampleRate = info[0].As<Napi::Number>().DoubleValue();
   double outputSampleRate = info[1].As<Napi::Number>().DoubleValue();
   uint32_t numberOfChannels = info[2].As<Napi::Number>().Uint32Value();
@@ -17,12 +26,21 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
     } else if (info[3].IsNumber()) {
       unsigned long recipe = info[3].As<Napi::Number>().Uint32Value();
       quality = soxr_quality_spec(recipe, 0);
+    } else {
+      Napi::TypeError::New(env, "The quality parameter should be an SoxrQuality value or null.").ThrowAsJavaScriptException();
+      return;
     }
   }
 
-  if(info.Length() > 4 && info[4].IsNumber()) {
-    unsigned numberOfThreads = info[4].As<Napi::Number>().Uint32Value();
-    runtime = soxr_runtime_spec(numberOfThreads);
+  if(info.Length() > 4) {
+    if(info[4].IsNumber()) {
+      unsigned maximumNumberOfThreads = info[4].As<Napi::Number>().Uint32Value();
+      runtime = soxr_runtime_spec(0);
+      this->maximumNumberOfThreads = maximumNumberOfThreads;
+    } else {
+      Napi::TypeError::New(env, "The maximumNumberOfThreads parameter must be a number.").ThrowAsJavaScriptException();
+      return;
+    }
   }
 
   soxr_t instance = soxr_create(inputSampleRate, outputSampleRate, numberOfChannels, &error, &ioFormat, &quality, &runtime);
@@ -33,7 +51,7 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
     this->numberOfChannels = numberOfChannels;
     this->soxrInstance = instance;
   } else {
-    Napi::Error::New(info.Env(), "Error while initializing the native SoxR instance.");
+    Napi::Error::New(info.Env(), "Error while initializing the native SoxR instance.").ThrowAsJavaScriptException();
   }
 };
 
@@ -60,13 +78,21 @@ Napi::Object SoxrWrapper::init(Napi::Env env, Napi::Object exports) {
 Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
+  if(info.Length() < 1 || !isFloat32Array(env, info[0])) {
+    Napi::TypeError::New(env, "The interleavedChannelData parameter should be a Float32Array.").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
+  omp_set_dynamic(0);
+  omp_set_num_threads(this->maximumNumberOfThreads);
+
   Napi::Float32Array input = info[0].As<Napi::Float32Array>();
+
   size_t inputLength = input.ElementLength();
   size_t inputFrames = static_cast<size_t>(inputLength / this->numberOfChannels);
   std::vector<float> inputVector(inputLength);
   size_t inputDone;
 
-  //size_t outputLength = static_cast<size_t>(inputLength * this->outputSampleRate / this->inputSampleRate + 0.5);
   size_t outputFrames = static_cast<size_t>(inputFrames * this->outputSampleRate / this->inputSampleRate + 0.5);
   size_t outputLength = static_cast<size_t>(outputFrames * this->numberOfChannels);
   Napi::Float32Array output = Napi::Float32Array::New(env, outputLength);
@@ -97,10 +123,11 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   outputVector = std::vector<float>();
 
   if(error) {
-    Napi::Error::New(info.Env(), "A native error occurred while resampling the audio data.");
+    Napi::Error::New(env, "A native error occurred while resampling the audio data.");
   } else {
     return output;
   }
+
 }
 
 Napi::Value SoxrWrapper::destroy(const Napi::CallbackInfo &info) {

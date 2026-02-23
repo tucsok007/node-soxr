@@ -40,14 +40,19 @@ export const SoxrWrapper: {
    * @param outputSampleRate - Sample rate of the output data.
    * @param numberOfChannels - Number of channels to process.
    * @param quality - Quality identifier for processing. See SoxrQuality for details about individual quality settings. (Default: VERY_HIGH)
-   * @param numberOfThreads - Number of threads to utilize for multi-thread processing. (Default: undefined => no multi-threading)
+   * @param maximumNumberOfThreads - The maximum number of threads to utilize for multi-thread processing. (Default: 1 => no multi-threading)
+   *
+   * Note: the number of threads spawned will not exceed the number of channels that are being processed in parallel (after the processing has started in libsoxr). During setup the library may utilize the maxmimum number of threads even if the number of channels are less than the maximum number of threads allowed.
+   *
+   * @example
+   * const nodeSoxr = new SoxrWrapper(44100, 22500, 2, SoxrQuality.HIGH_16, 2);
    */
   new (
     inputSampleRate: number,
     outputSampleRate: number,
     numberOfChannels: number,
     quality?: SoxrQuality,
-    numberOfThreads?: number,
+    maximumNumberOfThreads?: number,
   ): SoxrWrapper;
 } = NodeSoxr.SoxrWrapper;
 

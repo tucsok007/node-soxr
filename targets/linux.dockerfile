@@ -1,7 +1,7 @@
 FROM node:24-slim AS base
 
 RUN apt update
-RUN apt install build-essential make cmake gcc g++ python3 -y
+RUN apt install build-essential make cmake gcc g++ python3 libomp -y
 
 WORKDIR /app
 COPY ../ .
