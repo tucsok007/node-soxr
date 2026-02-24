@@ -40,8 +40,9 @@
     "install": "node-gyp-build",
     "install-ci": "npm ci --ignore-scripts",
     "configure": "node-gyp configure",
-    "build": "./build.sh",
+    "build": "sh ./build.sh -c -p",
     "test": "jest",
+    "prepublish": "sh ./build.sh",
     "gyp:build": "node-gyp confiugure build",
     "gyp:refresh-deps": "rm -rf build node_modules && npm i"
   },
