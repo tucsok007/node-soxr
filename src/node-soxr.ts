@@ -60,8 +60,8 @@ export const SoxrWrapper: {
  *
  * @param threadCount - The maximum number of threads that can be utilized by all instances (running in parallel).
  */
-export const setGlobalMaximumThreadCount: (threadCount: number) => void =
-  NodeSoxr.setGlobalMaximumThreadCount;
+export const setGlobalMaximumThreadCount =
+  NodeSoxr.setGlobalMaximumThreadCount as (threadCount: number) => void;
 
 /** Manually force-call the global garbage collector which will call the object destructors in C++. */
 export const soxrCleanup = () => {
