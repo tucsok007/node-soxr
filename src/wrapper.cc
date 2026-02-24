@@ -18,7 +18,7 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
   soxr_error_t error;
   soxr_io_spec_t const ioFormat = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
   soxr_quality_spec_t quality;
-  soxr_runtime_spec_t runtime;
+  soxr_runtime_spec_t runtime = soxr_runtime_spec(0);
 
   if(info.Length() > 3) {
     if(info[3].IsNull()) {
@@ -28,17 +28,6 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
       quality = soxr_quality_spec(recipe, 0);
     } else {
       Napi::TypeError::New(env, "The quality parameter should be an SoxrQuality value or null.").ThrowAsJavaScriptException();
-      return;
-    }
-  }
-
-  if(info.Length() > 4) {
-    if(info[4].IsNumber()) {
-      unsigned maximumNumberOfThreads = info[4].As<Napi::Number>().Uint32Value();
-      runtime = soxr_runtime_spec(0);
-      this->maximumNumberOfThreads = maximumNumberOfThreads;
-    } else {
-      Napi::TypeError::New(env, "The maximumNumberOfThreads parameter must be a number.").ThrowAsJavaScriptException();
       return;
     }
   }
@@ -82,9 +71,6 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
     Napi::TypeError::New(env, "The interleavedChannelData parameter should be a Float32Array.").ThrowAsJavaScriptException();
     return env.Undefined();
   }
-
-  omp_set_dynamic(0);
-  omp_set_num_threads(this->maximumNumberOfThreads);
 
   Napi::Float32Array input = info[0].As<Napi::Float32Array>();
 
@@ -136,8 +122,33 @@ Napi::Value SoxrWrapper::destroy(const Napi::CallbackInfo &info) {
   return info.Env().Undefined();
 }
 
+Napi::Value setGlobalMaximumThreadCount(const Napi::CallbackInfo &info) {
+  Napi::Env env = info.Env();
+  
+  if(info.Length() < 1 || !info[0].IsNumber()) {
+    Napi::TypeError::New(env, "The threadCount parameter should be a number.").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
+  uint32_t threadCount = info[0].As<Napi::Number>().Uint32Value();
+
+  omp_set_num_threads(threadCount);
+}
+
+Napi::Object registerStandaloneFunctions(Napi::Env env, Napi::Object exports) {
+  exports.Set("setGlobalMaximumThreadCount", Napi::Function::New(env, setGlobalMaximumThreadCount));
+
+  return exports;
+}
+
 Napi::Object init (Napi::Env env, Napi::Object exports) {
+  //Register exports
   SoxrWrapper::init(env, exports);
+  registerStandaloneFunctions(env, exports);
+
+  //Set global flags
+  omp_set_dynamic(0);
+
   return exports;
 }
 

@@ -1,9 +1,4 @@
-import {
-  deinterleaveChannelData,
-  interleaveChannelData,
-  SoxrQuality,
-  SoxrWrapper,
-} from "../node-soxr";
+import NodeSoxr from "../node-soxr";
 import { createReadStream, ReadStream } from "node:fs";
 import { AudioContext } from "node-web-audio-api";
 import { arrayBuffer } from "node:stream/consumers";
@@ -28,7 +23,7 @@ import { arrayBuffer } from "node:stream/consumers";
       channels.push(audioBuffer.getChannelData(channelIndex));
     }
 
-    return interleaveChannelData(...channels);
+    return NodeSoxr.interleaveChannelData(...channels);
   };
 
   const inputSampleRate = 44100;
@@ -38,23 +33,52 @@ import { arrayBuffer } from "node:stream/consumers";
     createReadStream(__dirname + "/440-sine.wav"),
   );
 
-  await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+  NodeSoxr.setGlobalMaximumThreadCount(4);
 
-  new Promise((resolve) => {
-    const soxr = new SoxrWrapper(
+  const resample = () => {
+    const soxr = new NodeSoxr.SoxrWrapper(
       inputSampleRate,
       outputSampleRate,
       audioBuffer.numberOfChannels,
-      SoxrQuality.VERY_HIGH,
-      4,
+      NodeSoxr.SoxrQuality.VERY_HIGH,
     );
 
     const inputData = getInterleavedChannelData(audioBuffer);
     const output = soxr.resample(inputData);
     soxr.destroy();
 
-    resolve(deinterleaveChannelData(output, audioBuffer.numberOfChannels));
-  }).then(console.log);
+    return NodeSoxr.deinterleaveChannelData(
+      output,
+      audioBuffer.numberOfChannels,
+    );
+  };
+
+  await new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+
+  //An example that spawns multiple instances in parallel
+  Promise.all([
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+    new Promise((resolve) => {
+      resolve(resample());
+    }),
+  ]).then(console.log);
 
   console.log("This is logged first.");
 })();

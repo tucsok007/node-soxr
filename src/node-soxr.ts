@@ -40,7 +40,6 @@ export const SoxrWrapper: {
    * @param outputSampleRate - Sample rate of the output data.
    * @param numberOfChannels - Number of channels to process.
    * @param quality - Quality identifier for processing. See SoxrQuality for details about individual quality settings. (Default: VERY_HIGH)
-   * @param maximumNumberOfThreads - The maximum number of threads to utilize for multi-thread processing. (Default: 1 => no multi-threading)
    *
    * Note: the number of threads spawned will not exceed the number of channels that are being processed in parallel (during the processing phases in libsoxr). During data transformation phases or additional under the hood mechanisms separate from the actual resampling of the input values the library may utilize the maxmimum number of threads even if the number of channels are less than the maximum number of threads allowed.
    *
@@ -52,11 +51,17 @@ export const SoxrWrapper: {
     outputSampleRate: number,
     numberOfChannels: number,
     quality?: SoxrQuality,
-    maximumNumberOfThreads?: number,
   ): SoxrWrapper;
 } = NodeSoxr.SoxrWrapper;
 
 //Utility functions
+
+/**Sets the number of maximum threads globally.
+ *
+ * @param threadCount - The maximum number of threads that can be utilized by all instances (running in parallel).
+ */
+export const setGlobalMaximumThreadCount: (threadCount: number) => void =
+  NodeSoxr.setGlobalMaximumThreadCount;
 
 /** Manually force-call the global garbage collector which will call the object destructors in C++. */
 export const soxrCleanup = () => {
