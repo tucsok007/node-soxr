@@ -1,9 +1,4 @@
-import {
-  deinterleaveChannelData,
-  interleaveChannelData,
-  SoxrQuality,
-  SoxrWrapper,
-} from "../node-soxr";
+import * as NodeSoxr from "../node-soxr";
 import { createReadStream, ReadStream } from "node:fs";
 import { AudioContext } from "node-web-audio-api";
 import { arrayBuffer } from "node:stream/consumers";
@@ -26,7 +21,7 @@ import { arrayBuffer } from "node:stream/consumers";
       channels.push(audioBuffer.getChannelData(channelIndex));
     }
 
-    return interleaveChannelData(...channels);
+    return NodeSoxr.interleaveChannelData(...channels);
   };
 
   const inputSampleRate = 44100;
@@ -35,18 +30,19 @@ import { arrayBuffer } from "node:stream/consumers";
   const audioBuffer = await getAudioBufferFromFileStream(
     createReadStream(__dirname + "/440-sine.wav"),
   );
-  const soxr = new SoxrWrapper(
+  const soxr = new NodeSoxr.SoxrWrapper(
     inputSampleRate,
     outputSampleRate,
     audioBuffer.numberOfChannels,
-    SoxrQuality.VERY_HIGH,
-    4,
+    NodeSoxr.SoxrQuality.VERY_HIGH,
   );
 
+  NodeSoxr.setGlobalMaximumThreadCount(4);
   const inputData = getInterleavedChannelData(audioBuffer);
-
   const output = soxr.resample(inputData);
   soxr.destroy();
 
-  console.log(deinterleaveChannelData(output, audioBuffer.numberOfChannels));
+  console.log(
+    NodeSoxr.deinterleaveChannelData(output, audioBuffer.numberOfChannels),
+  );
 })();

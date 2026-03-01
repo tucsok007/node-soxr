@@ -113,7 +113,6 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   } else {
     return output;
   }
-
 }
 
 Napi::Value SoxrWrapper::destroy(const Napi::CallbackInfo &info) {
@@ -130,9 +129,11 @@ Napi::Value setGlobalMaximumThreadCount(const Napi::CallbackInfo &info) {
     return env.Undefined();
   }
 
-  uint32_t threadCount = info[0].As<Napi::Number>().Uint32Value();
+  int threadCount = static_cast<int>(info[0].As<Napi::Number>().Uint32Value());
 
   omp_set_num_threads(threadCount);
+
+  return env.Undefined();
 }
 
 Napi::Object registerStandaloneFunctions(Napi::Env env, Napi::Object exports) {

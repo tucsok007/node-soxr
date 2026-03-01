@@ -1,6 +1,6 @@
 FROM node:24-alpine AS base
 
-RUN apk add --no-cache --virtual .build-deps build-base make cmake gcc g++ python3 libgomp
+RUN apk add --no-cache --virtual .build-deps build-base gcc g++ python3 libgomp
 
 WORKDIR /app
 COPY ../ .
