@@ -11,6 +11,18 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
     Napi::TypeError::New(env, "The first 3 parameters (inputSampleRate, outputSampleRate, numberOfChannels) must be provided.").ThrowAsJavaScriptException();
     return;
   }
+  if(!info[0].IsNumber()) {
+    Napi::TypeError::New(env, "The inputSampleRate argument must be a number.").ThrowAsJavaScriptException();
+    return;
+  }
+  if(!info[1].IsNumber()) {
+    Napi::TypeError::New(env, "The outputSampleRate argument must be a number.").ThrowAsJavaScriptException();
+    return;
+  }
+  if(!info[2].IsNumber()) {
+    Napi::TypeError::New(env, "The numberOfChannels argument must be a number.").ThrowAsJavaScriptException();
+    return;
+  }
 
   double inputSampleRate = info[0].As<Napi::Number>().DoubleValue();
   double outputSampleRate = info[1].As<Napi::Number>().DoubleValue();
@@ -30,6 +42,8 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
       Napi::TypeError::New(env, "The quality parameter should be an SoxrQuality value or null.").ThrowAsJavaScriptException();
       return;
     }
+  } else {
+    quality = soxr_quality_spec(SOXR_VHQ, 0);
   }
 
   soxr_t instance = soxr_create(inputSampleRate, outputSampleRate, numberOfChannels, &error, &ioFormat, &quality, &runtime);
@@ -73,7 +87,6 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   }
 
   Napi::Float32Array input = info[0].As<Napi::Float32Array>();
-
   size_t inputLength = input.ElementLength();
   size_t inputFrames = static_cast<size_t>(inputLength / this->numberOfChannels);
   std::vector<float> inputVector(inputLength);

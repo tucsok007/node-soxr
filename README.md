@@ -1,5 +1,7 @@
 # Node-Soxr
 
+[![npm-tag](https://img.shields.io/badge/npm-1.0.0-green?logo=npm)](https://www.npmjs.com/package/node-soxr) [![git-tag](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/tucsok007/node-soxr)
+
 Node.js native addon wrapper for libsoxr (high quality and high performance offline audio resampler).
 
 ---
@@ -100,8 +102,6 @@ To build the library you may run `npm run build`, or use the provided shell scri
 The C++ standard used for this project is C++ 17.
 
 All contributions are welcome. In order to contribute, please make a fork of this project and make a pull request to the main branch of this project once you added your changes.
-
-Please make sure to use the same major and minor versions as the corresponding SoxR version - this way users can easily understand which SoxR version is embedded in this wrapper. (Use the patch version for changes to the same minor version.)
 
 ## Licensing/Credits:
 

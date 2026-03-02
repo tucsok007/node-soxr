@@ -1,6 +1,6 @@
 {
   "name": "node-soxr",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "author": "Clio Orgyán",
   "license": "LGPL-2.1-only",
   "description": "Node native addon wrapper for the SoxR C library.",
@@ -41,7 +41,7 @@
     "install-ci": "npm ci --ignore-scripts",
     "configure": "node-gyp configure",
     "build": "sh ./build.sh -c -p",
-    "test": "jest",
+    "test": "set NODE_OPTIONS=--experimental-vm-modules && jest --coverage",
     "prepublish": "sh ./build.sh",
     "gyp:build": "node-gyp confiugure build",
     "gyp:refresh-deps": "rm -rf build node_modules && npm i"

@@ -76,6 +76,16 @@ export const soxrCleanup = () => {
  * @returns Interleaved Float32Array<ArrayBuffer> channel data.
  */
 export const interleaveChannelData = (...channels: Float32Array[]) => {
+  if (
+    !channels ||
+    channels.length < 2 ||
+    !channels.every((channel) => channel instanceof Float32Array)
+  ) {
+    throw new TypeError(
+      "Please provide more than 1 channels' Float32Array data to interleave them.",
+    );
+  }
+
   const channelLength = channels[0].length;
   const numberOfChannels = channels.length;
   const result = new Float32Array(channelLength * numberOfChannels);
@@ -100,6 +110,20 @@ export const deinterleaveChannelData = (
   data: Float32Array,
   numberOfChannels: number,
 ): Float32Array[] => {
+  if (!data || !(data instanceof Float32Array)) {
+    throw new TypeError("The data parameter must be a Float32Array.");
+  }
+  if (!numberOfChannels || numberOfChannels <= 1) {
+    throw new TypeError(
+      "The number of channels has to be greater than 1 to deinterleave the channel data.",
+    );
+  }
+  if (data.length % numberOfChannels !== 0) {
+    throw new TypeError(
+      "The length of the provided interleaved channel data doesn't correspond to the value of numberOfChannels.",
+    );
+  }
+
   const channelLength = data.length / numberOfChannels;
   const result: Float32Array[] = [];
 
