@@ -1,4 +1,4 @@
-const NodeSoxr = require("../build/Release/node-soxr.node");
+const NodeSoxr = require("node-gyp-build")(__dirname);
 
 interface SoxrWrapper {
   /** Resamples the provided interleaved channel data with the resampler.
@@ -40,18 +40,28 @@ export const SoxrWrapper: {
    * @param outputSampleRate - Sample rate of the output data.
    * @param numberOfChannels - Number of channels to process.
    * @param quality - Quality identifier for processing. See SoxrQuality for details about individual quality settings. (Default: VERY_HIGH)
-   * @param numberOfThreads - Number of threads to utilize for multi-thread processing. (Default: undefined => no multi-threading)
+   *
+   * Note: the number of threads spawned will not exceed the number of channels that are being processed in parallel (during the processing phases in libsoxr). During data transformation phases or additional under the hood mechanisms separate from the actual resampling of the input values the library may utilize the maximum number of threads even if the number of channels are less than the maximum number of threads allowed.
+   *
+   * @example
+   * const nodeSoxr = new SoxrWrapper(44100, 22500, 2, SoxrQuality.HIGH_16, 2);
    */
   new (
     inputSampleRate: number,
     outputSampleRate: number,
     numberOfChannels: number,
     quality?: SoxrQuality,
-    numberOfThreads?: number,
   ): SoxrWrapper;
 } = NodeSoxr.SoxrWrapper;
 
 //Utility functions
+
+/**Sets the number of maximum threads globally.
+ *
+ * @param threadCount - The maximum number of threads that can be utilized by all instances (running in parallel).
+ */
+export const setGlobalMaximumThreadCount =
+  NodeSoxr.setGlobalMaximumThreadCount as (threadCount: number) => void;
 
 /** Manually force-call the global garbage collector which will call the object destructors in C++. */
 export const soxrCleanup = () => {
@@ -66,6 +76,16 @@ export const soxrCleanup = () => {
  * @returns Interleaved Float32Array<ArrayBuffer> channel data.
  */
 export const interleaveChannelData = (...channels: Float32Array[]) => {
+  if (
+    !channels ||
+    channels.length < 2 ||
+    !channels.every((channel) => channel instanceof Float32Array)
+  ) {
+    throw new TypeError(
+      "Please provide more than 1 channels' Float32Array data to interleave them.",
+    );
+  }
+
   const channelLength = channels[0].length;
   const numberOfChannels = channels.length;
   const result = new Float32Array(channelLength * numberOfChannels);
@@ -80,16 +100,30 @@ export const interleaveChannelData = (...channels: Float32Array[]) => {
   return result;
 };
 
-/** Deinterleaves the provided channel data based on the number of channels.
+/** De-interleaves the provided channel data based on the number of channels.
  *
  * @param data - Interleaved Float32Array<ArrayBufferLike> channel data.
  * @param numberOfChannels - The number of channels.
- * @returns Deinterleaved Float32Array<ArrayBufferLike>[] channel data.
+ * @returns De-interleaved Float32Array<ArrayBufferLike>[] channel data.
  */
 export const deinterleaveChannelData = (
   data: Float32Array,
   numberOfChannels: number,
 ): Float32Array[] => {
+  if (!data || !(data instanceof Float32Array)) {
+    throw new TypeError("The data parameter must be a Float32Array.");
+  }
+  if (!numberOfChannels || numberOfChannels <= 1) {
+    throw new TypeError(
+      "The number of channels has to be greater than 1 to deinterleave the channel data.",
+    );
+  }
+  if (data.length % numberOfChannels !== 0) {
+    throw new TypeError(
+      "The length of the provided interleaved channel data doesn't correspond to the value of numberOfChannels.",
+    );
+  }
+
   const channelLength = data.length / numberOfChannels;
   const result: Float32Array[] = [];
 
