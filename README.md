@@ -25,7 +25,7 @@ Node.js native addon wrapper for libsoxr (high quality and high performance offl
    npm i node-soxr
    ```
 
-   **_Note: the npm package includes pre-built binaries for Linux (incl. builds for all architectures supported by LTS Node.js), Alipne containers (all Node.js LTS supported architectures), and Windows (x64 only). For different operating systems and architectures (ex. darwin - MacOS) please make sure to install the necessary build tools on your system so the corresponding binaries can be built on your system at install time. If the required build tools are missing install will fail._**
+   **_Note: the npm package includes pre-built binaries for Linux (incl. builds for all architectures supported by LTS Node.js), Alpine containers (all Node.js LTS supported architectures), and Windows (x64 only). For different operating systems and architectures (ex. darwin - MacOS) please make sure to install the necessary build tools on your system so the corresponding binaries can be built on your system at install time. If the required build tools are missing install will fail._**
 
 ## Usage:
 
@@ -45,7 +45,7 @@ soxr.destroy();
 import * as NodeSoxr from "node-soxr";
 
 const maxThreads = 8;
-//Call this once to set the global limit - desireably on your module init
+//Call this once to set the global limit - desirably on your module init
 NodeSoxr.setGlobalMaximumThreadCount(maxThreads);
 
 const soxr = new NodeSoxr.SoxrWrapper(48000, 44100, 2);
@@ -79,7 +79,7 @@ const outputData = NodeSoxr.deinterleaveChannelData(
 soxr.destroy();
 ```
 
-[You can find an in depth example here regarding how you can utilize the library in a real-world scenario.](examples/example.ts)
+[You can find an in depth example regarding how you can utilize the library in a real-world scenario here.](examples/example.ts)
 
 ###### At the moment only CBR resampling is supported. (This might not change.)
 
@@ -105,7 +105,7 @@ All contributions are welcome. In order to contribute, please make a fork of thi
 
 ## Licensing/Credits:
 
-This library is wrapper built on top of the source code of the [Sox Resampler Library](https://github.com/chirlu/soxr).
+This library is a wrapper built on top of the source code of the [SoX Resampler Library](https://github.com/chirlu/soxr).
 
 This project is licensed under the terms of the [LGPL 2.1](LICENCE) - see the [LICENSE](LICENCE) file for details.
 

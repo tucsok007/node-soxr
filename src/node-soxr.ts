@@ -41,7 +41,7 @@ export const SoxrWrapper: {
    * @param numberOfChannels - Number of channels to process.
    * @param quality - Quality identifier for processing. See SoxrQuality for details about individual quality settings. (Default: VERY_HIGH)
    *
-   * Note: the number of threads spawned will not exceed the number of channels that are being processed in parallel (during the processing phases in libsoxr). During data transformation phases or additional under the hood mechanisms separate from the actual resampling of the input values the library may utilize the maxmimum number of threads even if the number of channels are less than the maximum number of threads allowed.
+   * Note: the number of threads spawned will not exceed the number of channels that are being processed in parallel (during the processing phases in libsoxr). During data transformation phases or additional under the hood mechanisms separate from the actual resampling of the input values the library may utilize the maximum number of threads even if the number of channels are less than the maximum number of threads allowed.
    *
    * @example
    * const nodeSoxr = new SoxrWrapper(44100, 22500, 2, SoxrQuality.HIGH_16, 2);
@@ -100,11 +100,11 @@ export const interleaveChannelData = (...channels: Float32Array[]) => {
   return result;
 };
 
-/** Deinterleaves the provided channel data based on the number of channels.
+/** De-interleaves the provided channel data based on the number of channels.
  *
  * @param data - Interleaved Float32Array<ArrayBufferLike> channel data.
  * @param numberOfChannels - The number of channels.
- * @returns Deinterleaved Float32Array<ArrayBufferLike>[] channel data.
+ * @returns De-interleaved Float32Array<ArrayBufferLike>[] channel data.
  */
 export const deinterleaveChannelData = (
   data: Float32Array,

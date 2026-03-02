@@ -209,7 +209,10 @@ describe("NodeSoxr module", () => {
           const monoSine32 = Float32Array.from(createSineWave(12));
           const monoSine16 = Float16Array.from(createSineWave(12));
 
-          return NodeSoxr.interleaveChannelData(monoSine32, monoSine16);
+          return (NodeSoxr as any).interleaveChannelData(
+            monoSine32,
+            monoSine16,
+          );
         };
 
         expect(interleave).toThrow(
