@@ -9,7 +9,187 @@ on:
       - main
 
 jobs:
-  build-test-publish:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          cache: 'npm'
+
+      - name: Install Python and MSVC via Chocolatey
+        run: |
+          choco install python -y
+          choco install visualstudio2026buildtools --includeOptional -y
+
+      - name: Setup Git Bash
+        run: |
+          echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: "c-cpp, javascript-typescript"
+          queries: security-and-quality
+
+      - name: Build with local.sh
+        shell: sh
+        run: sh ./local.sh
+
+      - name: Perform CodeQL Static Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          upload: partial
+
+      - name: Run unit tests
+        shell: sh
+        run: npm run test
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          cache: 'npm'
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build with build.sh
+        shell: sh
+        run: sh ./build.sh -sl
+
+      - name: Upload prebuilds (x64)
+        uses: actions/upload-artifact
+        with:
+          name: linux-x64
+          path: prebuilds/linux-x64
+          retention-days: 1
+
+      - name: Upload prebuilds (arm64)
+        uses: actions/upload-artifact
+        with:
+          name: linux-arm64
+          path: prebuilds/linux-arm64
+          retention-days: 1
+
+      - name: Upload prebuilds (s390x)
+        uses: actions/upload-artifact
+        with:
+          name: linux-s390x
+          path: prebuilds/linux-s390x
+          retention-days: 1
+
+      - name: Upload prebuild (ppc64)
+        uses: actions/upload-artifact
+        with:
+          name: linux-ppc64
+          path: prebuilds/linux-ppc64
+          retention-days: 1
+
+  build-darwin:
+    strategy:
+      matrix:
+        os: [macos-26-intel, macos-26]
+        architecture: [x64, arm64]
+      exclude:
+        - os: macos-26-intel
+          architecture: arm64
+        - os: macos-26
+          architecture: x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          architecture: ${{ matrix.architecture }}
+          cache: 'npm'
+
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install LLVM via Homebrew
+        run: brew install llvm
+
+      - name: Install Python via Homebrew
+        run: brew install python
+
+      - name: Build with local.sh
+        shell: sh
+        run: sh ./local.sh
+
+      - name: Upload prebuild
+        uses: actions/upload-artifact
+        with:
+          name: darwin-${{ matrix.architecture }}
+          path: prebuilds/darwin-${{ matrix.architecture }}/
+          retention-days: 1
+
+#   build-windows:
+#     strategy:
+#       matrix:
+#         os: [window-latest, windows-11-arm]
+#         architecture: [x64, arm64]
+#       exclude:
+#         - os: windows-latest
+#           architecture: arm64
+#         - os: windows-11-arm
+#           architecture: x64
+
+#       runs-on: ${{ matrix.os }}
+
+#       steps:
+#         - name: Checkout code
+#           uses: actions/checkout@v4
+
+#         - name: Setup Node.js LTS
+#           uses: actions/setup-node@v4
+#           with:
+#             node-version: "lts/*"
+#             registry-url: "https://registry.npmjs.org"
+#             architecture: ${{ matrix.architecture }}
+        
+#         - name: Install Python and MSVC via Chocolatey
+#           run: |
+#             choco install python -y
+#             choco install visualstudio2026buildtools --includeOptional -y
+
+#         - name: Setup Git Bash
+#           run: |
+#             echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+#         - name: Build with build.sh
+#           shell: sh
+#           run: sh ./local.sh
+
+#         - name: Upload prebuild
+#           uses: actions/upload-artifact
+#           with:
+#             name: windows-${{ matrix.architecture }}
+#             path: prebuilds/windows-${{ matrix.architecture }}/
+#             retention-days: 1
+
+  publish:
     runs-on: windows-latest
 
     steps:
@@ -27,32 +207,49 @@ jobs:
           choco install python -y
           choco install visualstudio2026buildtools --includeOptional -y
 
-      - name: Instaall Docker Engine via Chocolatey
-        run: |
-          choco install docker-engine
-
       - name: Setup Git Bash
         run: |
           echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: "c-cpp, javascript-typescript"
-          queries: security-and-quality
-
-      - name: Build with build.sh
+      - name: Build with local.sh
         shell: sh
-        run: export HOME=$(pwd) && sh ./build.sh
+        run: export HOME=$(pwd) && sh ./local.sh
 
-      - name: Perform CodeQL Static Analysis
-        uses: github/codeql-action/analyze@v4
+      - name: Download linux (x64) prebuilds
+        uses: actions/download-artifact
         with:
-          upload: partial
+          name: linux-x64
+          path: ./prebuilds/linux-x64
 
-      - name: Run unit tests
-        shell: sh
-        run: npm run test
+      - name: Download linux (arm64) prebuilds
+        uses: actions/download-artifact
+        with:
+          name: linux-arm64
+          path: ./prebuilds/linux-arm64
+
+      - name: Download linux (s390x) prebuilds
+        uses: actions/download-artifact
+        with:
+          name: linux-s390x
+          path: ./prebuilds/linux-s390x
+
+      - name: Download linux (ppc64) prebuild
+        uses: actions/download-artifact
+        with:
+          name: linux-ppc64
+          path: ./prebuilds/linux-ppc64
+
+      - name: Download darwin (x64) prebuild
+        uses: actions/download-artifact
+        with:
+          name: darwin-x64
+          path: ./prebuilds/darwin-x64
+
+      - name: Download darwin (arm64) prebuild
+        uses: actions/download-artifact
+        with:
+          name: darwin-arm64
+          path: ./prebuilds/darwin-arm64
 
       - name: Extract version from package.json
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
@@ -70,3 +267,6 @@ jobs:
       - name: Publish to npm
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         run: npm publish
+
+      - name: Dry publish
+        run: npm publish --dry-run

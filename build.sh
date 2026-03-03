@@ -1,5 +1,9 @@
 #!/bin/sh
 
+should_pack=false
+should_cleanup=false
+skip_local_build=false
+
 usage() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
@@ -25,7 +29,9 @@ build() {
   echo 'Building...';
   docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/amd64,linux/arm64,linux/s390x --target exporter --output type=local,dest=./output .
   docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --target exporter --output type=local,dest=./output .
-  npx prebuildify --napi --tag-libc
+  if [ "$skip_local_build" = false ] ; then
+    npx prebuildify --napi --tag-libc
+  fi
 
   echo 'Re-organizing build output...';
   mkdir prebuilds
@@ -45,9 +51,6 @@ pack() {
   npm pack
 }
 
-should_pack=false
-should_cleanup=false
-
 handle_options() {
   while [ $# -gt 0 ]; do
     case $1 in
@@ -60,6 +63,9 @@ handle_options() {
         ;;
       -p | --pack)
         should_pack=true
+        ;;
+      -sl | --skip-local)
+        skip_local_build=true
         ;;
       *)
         echo "Invalid option: $1" >&2
