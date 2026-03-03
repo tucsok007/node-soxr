@@ -126,9 +126,9 @@ jobs:
         architecture: [x64, arm64]
         exclude:
           - os: macos-26-intel
-          architecture: arm64
+            architecture: arm64
           - os: macos-26
-          architecture: x64
+            architecture: x64
     runs-on: ${{ matrix.os }}
     needs: test
     steps:
