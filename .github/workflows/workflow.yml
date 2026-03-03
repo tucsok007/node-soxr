@@ -42,7 +42,7 @@ jobs:
         shell: sh
         run: sh ./local.sh
 
-      - name: Perform CodeQL Static Analysis
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
           upload: partial
@@ -65,7 +65,18 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: 'npm'
 
-      - name: Set up QEMU
+      - name: Setup Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "debug": true,
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+        
+      - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Setup Docker Buildx
