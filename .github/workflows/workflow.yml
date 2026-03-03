@@ -210,7 +210,7 @@ jobs:
 
   bulid-windows-and-publish:
     runs-on: windows-latest
-    needs: [build-linux]
+    needs: [build-linux, build-darwin]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
