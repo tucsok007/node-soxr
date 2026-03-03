@@ -37,11 +37,10 @@
       'conditions': [
         ['OS=="mac"', {
           'cflags+': ['-fvisibility=hidden', '-Xpreprocessor'],
-          'ldflags+': ["-lomp"],
           'libraries': ["-lomp"],
           'xcode_settings': {
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
-            'OTHER_CFLAGS': [ "-Xpreprocessor", "-fopenmp" ]
+            'OTHER_CFLAGS': ["-Xpreprocessor", "-fopenmp"]
           }
         }],
         ['OS=="linux"', {

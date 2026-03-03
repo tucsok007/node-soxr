@@ -89,7 +89,7 @@ jobs:
 
       - name: Build with build.sh
         shell: sh
-        run: sh ./build.sh -sl
+        run: sh ./build.sh -sl -sdb
 
       - name: Upload prebuilds (x64)
         uses: actions/upload-artifact@v7
@@ -146,8 +146,10 @@ jobs:
       - name: Setup Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Install LLVM via Homebrew
-        run: brew install llvm
+      - name: Install LLVM and OpenMP via Homebrew
+        run: |
+          brew install llvm
+          brew install libomp
 
       - name: Install Python via Homebrew
         run: brew install python
