@@ -35,22 +35,15 @@ jobs:
         run: |
           echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Build with build.sh
-        shell: sh
-        run: export HOME=$(pwd) && sh ./build.sh
-
-      - name: Run unit tests
-        uses: nick-fields/retry@v3
-        with:
-          max_attempts: 5
-          timeout_minutes: 1
-          command: npm run test
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: "c-cpp, javascript-typescript"
           queries: security-and-quality
+
+      - name: Build with build.sh
+        shell: sh
+        run: export HOME=$(pwd) && sh ./build.sh
 
       - name: Perform CodeQL Analysis for C/C++
         uses: github/codeql-action/analyze@v4
@@ -63,6 +56,13 @@ jobs:
         with:
           category: "/language:javascript-typescript"
           upload: partial
+
+      - name: Run unit tests
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 5
+          timeout_minutes: 1
+          command: npm run test
 
       - name: Publish to npm
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
