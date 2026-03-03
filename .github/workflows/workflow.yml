@@ -65,6 +65,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: 'npm'
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -187,7 +190,7 @@ jobs:
 #             path: prebuilds/windows-${{ matrix.architecture }}/
 #             retention-days: 1
 
-  publish:
+  bulid-windows-and-publish:
     runs-on: windows-latest
     needs: [build-linux]
     steps:
@@ -199,6 +202,7 @@ jobs:
         with:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
+          cache: 'npm'
 
       - name: Install Python and MSVC via Chocolatey
         run: |
