@@ -17,7 +17,7 @@ build() {
   cleanup
 
   echo 'Setting up Docker buildx env...';
-  set DOCKER_BUILDKIT=1
+  export DOCKER_BUILDKIT=1
 
   echo 'Installing dependencies...';
   npm run install-ci
