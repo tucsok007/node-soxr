@@ -53,7 +53,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-
+    needs: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,9 +110,8 @@ jobs:
 #           architecture: arm64
 #           - os: macos-26
 #           architecture: x64
-
 #     runs-on: ${{ matrix.os }}
-
+#     needs: test
 #     steps:
 #       - name: Checkout code
 #         uses: actions/checkout@v4
@@ -155,9 +154,8 @@ jobs:
 #           architecture: arm64
 #         - os: windows-11-arm
 #           architecture: x64
-
 #       runs-on: ${{ matrix.os }}
-
+#       needs: test
 #       steps:
 #         - name: Checkout code
 #           uses: actions/checkout@v4
@@ -191,7 +189,7 @@ jobs:
 
   publish:
     runs-on: windows-latest
-
+    needs: [build-linux]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
