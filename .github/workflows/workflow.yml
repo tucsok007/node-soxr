@@ -157,7 +157,7 @@ jobs:
         run: sh ./local.sh
 
       - name: Upload prebuild
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v7
         with:
           name: darwin-${{ matrix.architecture }}
           path: prebuilds/darwin-${{ matrix.architecture }}/
@@ -200,7 +200,7 @@ jobs:
 #           run: sh ./local.sh
 
 #         - name: Upload prebuild
-#           uses: actions/upload-artifact
+#           uses: actions/upload-artifact@v7
 #           with:
 #             name: windows-${{ matrix.architecture }}
 #             path: prebuilds/windows-${{ matrix.architecture }}/
