@@ -11,7 +11,8 @@ on:
 jobs:
   test:
     runs-on: windows-latest
-
+    permissions:
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -81,6 +82,10 @@ jobs:
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+        buildkitd-config-inline: |
+          [worker.oci]
+          max-parallelism = 2
 
       - name: Build with build.sh
         shell: sh
@@ -114,49 +119,49 @@ jobs:
           path: prebuilds/linux-ppc64
           retention-days: 1
 
-#   build-darwin:
-#     strategy:
-#       matrix:
-#         os: [macos-26-intel, macos-26]
-#         architecture: [x64, arm64]
-#         exclude:
-#           - os: macos-26-intel
-#           architecture: arm64
-#           - os: macos-26
-#           architecture: x64
-#     runs-on: ${{ matrix.os }}
-#     needs: test
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
+  build-darwin:
+    strategy:
+      matrix:
+        os: [macos-26-intel, macos-26]
+        architecture: [x64, arm64]
+        exclude:
+          - os: macos-26-intel
+          architecture: arm64
+          - os: macos-26
+          architecture: x64
+    runs-on: ${{ matrix.os }}
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-#       - name: Setup Node.js LTS
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: "lts/*"
-#           registry-url: "https://registry.npmjs.org"
-#           architecture: ${{ matrix.architecture }}
-#           cache: 'npm'
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          architecture: ${{ matrix.architecture }}
+          cache: 'npm'
 
-#       - name: Setup Homebrew
-#         uses: Homebrew/actions/setup-homebrew@master
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
 
-#       - name: Install LLVM via Homebrew
-#         run: brew install llvm
+      - name: Install LLVM via Homebrew
+        run: brew install llvm
 
-#       - name: Install Python via Homebrew
-#         run: brew install python
+      - name: Install Python via Homebrew
+        run: brew install python
 
-#       - name: Build with local.sh
-#         shell: sh
-#         run: sh ./local.sh
+      - name: Build with local.sh
+        shell: sh
+        run: sh ./local.sh
 
-#       - name: Upload prebuild
-#         uses: actions/upload-artifact
-#         with:
-#           name: darwin-${{ matrix.architecture }}
-#           path: prebuilds/darwin-${{ matrix.architecture }}/
-#           retention-days: 1
+      - name: Upload prebuild
+        uses: actions/upload-artifact
+        with:
+          name: darwin-${{ matrix.architecture }}
+          path: prebuilds/darwin-${{ matrix.architecture }}/
+          retention-days: 1
 
 #   build-windows:
 #     strategy:

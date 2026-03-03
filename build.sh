@@ -7,9 +7,10 @@ skip_local_build=false
 usage() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
-  echo " -h, --help     Display this help message."
-  echo " -c, --cleanup  Cleanup files after build."
-  echo " -p, --pack     Pack the output into an npm package."
+  echo " -h, --help         Display this help message."
+  echo " -c, --cleanup      Cleanup files after build."
+  echo " -p, --pack         Pack the output into an npm package."
+  echo " -sl, --skip-local  Skip building binaries on the local machine (only Docker targets will be built)."
 }
 
 cleanup() {
