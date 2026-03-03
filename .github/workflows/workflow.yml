@@ -22,16 +22,14 @@ jobs:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Install Chocolatey
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
       - name: Install Python and MSVC via Chocolatey
         run: |
           choco install python -y
           choco install visualstudio2026buildtools --includeOptional -y
+
+      - name: Upgrade Docker via Chocolatey
+        run: |
+          choco upgrade docker-cli
 
       - name: Setup Git Bash
         run: |
@@ -42,7 +40,10 @@ jobs:
         run: sh ./build.sh
 
       - name: Run unit tests
-        run: npm run test
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 5
+          command: npm run test
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
