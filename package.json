@@ -1,6 +1,6 @@
 {
   "name": "node-soxr",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "author": "Clio Orgyán",
   "license": "LGPL-2.1-only",
   "description": "Node native addon wrapper for the SoxR C library.",

@@ -79,7 +79,7 @@ const outputData = NodeSoxr.deinterleaveChannelData(
 soxr.destroy();
 ```
 
-[You can find an in depth example regarding how you can utilize the library in a real-world scenario here.](examples/example.ts)
+[For more extensive examples please click here.](examples/)
 
 ###### At the moment only CBR resampling is supported. (This might not change.)
 
@@ -90,7 +90,7 @@ To build the library you may run `npm run build`, or use the provided shell scri
 #### Dependencies:
 
 - Python3
-- C/C++ build tools (installing through the Node.js installer is recommmended)
+- C/C++ build tools (installing through the Node.js installer is recommended)
 - An OpenMP runtime:
   - on Windows it's shipped with MSVC,
   - on Mac please use `brew install libomp`,
