@@ -73,28 +73,28 @@ jobs:
         run: sh ./build.sh -sl
 
       - name: Upload prebuilds (x64)
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v7
         with:
           name: linux-x64
           path: prebuilds/linux-x64
           retention-days: 1
 
       - name: Upload prebuilds (arm64)
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v7
         with:
           name: linux-arm64
           path: prebuilds/linux-arm64
           retention-days: 1
 
       - name: Upload prebuilds (s390x)
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v7
         with:
           name: linux-s390x
           path: prebuilds/linux-s390x
           retention-days: 1
 
       - name: Upload prebuild (ppc64)
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v7
         with:
           name: linux-ppc64
           path: prebuilds/linux-ppc64
@@ -216,37 +216,37 @@ jobs:
         run: export HOME=$(pwd) && sh ./local.sh
 
       - name: Download linux (x64) prebuilds
-        uses: actions/download-artifact
+        uses: actions/download-artifact@v8
         with:
           name: linux-x64
           path: ./prebuilds/linux-x64
 
       - name: Download linux (arm64) prebuilds
-        uses: actions/download-artifact
+        uses: actions/download-artifact@v8
         with:
           name: linux-arm64
           path: ./prebuilds/linux-arm64
 
       - name: Download linux (s390x) prebuilds
-        uses: actions/download-artifact
+        uses: actions/download-artifact@v8
         with:
           name: linux-s390x
           path: ./prebuilds/linux-s390x
 
       - name: Download linux (ppc64) prebuild
-        uses: actions/download-artifact
+        uses: actions/download-artifact@v8
         with:
           name: linux-ppc64
           path: ./prebuilds/linux-ppc64
 
       - name: Download darwin (x64) prebuild
-        uses: actions/download-artifact
+        uses: actions/download-artifact@v8
         with:
           name: darwin-x64
           path: ./prebuilds/darwin-x64
 
       - name: Download darwin (arm64) prebuild
-        uses: actions/download-artifact
+        uses: actions/download-artifact@v8
         with:
           name: darwin-arm64
           path: ./prebuilds/darwin-arm64
