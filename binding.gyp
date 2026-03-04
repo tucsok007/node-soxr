@@ -27,7 +27,6 @@
       'xcode_settings': {
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'CLANG_CXX_LIBRARY': 'libc++',
-        'CMAKE_OSX_DEPLOYMENT_TARGET': '13.2.1',
         'MACOSX_DEPLOYMENT_TARGET': '13.2.1'
       },
       'msvs_settings': {
@@ -46,7 +45,6 @@
             'soxr/src/fft4g32.c',
             'soxr/src/fft4g64.c',
             'soxr/src/filter.c',
-            'soxr/src/pffft32.c',
             'soxr/src/soxr.c',
             'soxr/src/vr32.c',
           ],

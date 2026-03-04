@@ -134,6 +134,11 @@ jobs:
       - name: Setup Homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
+      - name: Re-install XCode
+        run: |
+          rm -rf  /Library/Developer/CommandLineTools
+          xcode-select --install
+
       - name: Install LLVM and OpenMP via Homebrew
         run: |
           brew install llvm
