@@ -58,10 +58,13 @@ jobs:
   build-linux:
     strategy:
       matrix:
-        architecture: [amd64, arm64, s390x, ppc64le]
+        architecture: [x64, arm64, s390x, ppc64le]
         flavor: [musl, glibc]
         exclude:
           - architecture: ppc64le
+            flavor: musl
+          #Had to temporarily remove prebuild support due to a QEMU bug with how s390x handles alpine npm
+          - architecture: s390x
             flavor: musl
     runs-on: ubuntu-latest
     needs: test

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-platforms=("linux/amd64" "linux/arm64" "linux/s390x" "linux/ppc64le")
+platforms=("linux/x64" "linux/arm64" "linux/s390x" "linux/ppc64le")
 flavors=("musl" "glibc")
 
 platform=""
@@ -43,7 +43,11 @@ if [ $# -lt 1 ]; then
   echo "Misising platform."
 else
   if includes $1 "${platforms[@]}"; then
-    platform=$1
+    if [ $1 == "linux/x64" ]; then
+      platform="linux/amd64"
+    else
+      platform=$1
+    fi
     if [ $# -gt 1 ]; then
       if [ $# -lt 3 ]; then
         if includes $2 "${flavors[@]}"; then
@@ -55,6 +59,8 @@ else
       else
         echo "Too many arguments."
       fi
+    else
+      build
     fi
   else
     echo "Platform not allowed."
