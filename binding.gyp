@@ -36,7 +36,7 @@
       'conditions': [
         ['OS=="mac"', {
           'cflags+': ['-fvisibility=hidden', '-Xpreprocessor'],
-          'cflags_cc+': ['-Xpreprocessor']
+          'cflags_cc+': ['-Xpreprocessor'],
           'libraries': ["-lomp"],
           'xcode_settings': {
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
