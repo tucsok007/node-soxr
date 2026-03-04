@@ -250,19 +250,15 @@ jobs:
           name: darwin-arm64
           path: ./prebuilds
 
-      - name: Extract version from package.json
+      - name: Create Git tag
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         shell: sh
         run: |
-          echo "PACKAGE_VERSION=$(grep '"version"' package.json | head -1 | grep -oP '(?<="version": ")[^"]*')" >> $GITHUB_ENV
-
-      - name: Create Git tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
-        run: |
+          export PACKAGE_VERSION=$(grep '"version"' package.json | head -1 | grep -oP '(?<="version": ")[^"]*')
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git tag -a "v${{ env.PACKAGE_VERSION }}" -m "Release v${{ env.PACKAGE_VERSION }}"
-          git push origin "v${{ env.PACKAGE_VERSION }}"
+          git tag -a "v${PACKAGE_VERSION}" -m "Release v${PACKAGE_VERSION}"
+          git push origin "v${PACKAGE_VERSION}"
 
       - name: Dry publish
         if: github.ref != 'refs/heads/main' && success()
