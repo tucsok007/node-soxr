@@ -37,7 +37,7 @@
         ['OS=="mac"', {
           'cflags+': ['-fvisibility=hidden', '-Xpreprocessor'],
           'cflags_cc+': ['-Xpreprocessor'],
-          'libraries': ["-lomp"],
+          'libraries': ["-lomp", "-L$LIBOMP_ROOT/lib"],
           'xcode_settings': {
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
             'OTHER_CFLAGS': ["-Xpreprocessor", "-fopenmp"]

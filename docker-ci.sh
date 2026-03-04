@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 platforms=("linux/amd64" "linux/arm64" "linux/s390x" "linux/ppc64le")
 flavors=("musl" "glibc")

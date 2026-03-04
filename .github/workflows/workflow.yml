@@ -94,8 +94,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build with docker-ci.sh
-        shell: sh
-        run: sh ./docker-ci.sh linux/${{ matrix.architecture }} ${{ matrix.flavor }}
+        shell: bash
+        run: bash ./docker-ci.sh linux/${{ matrix.architecture }} ${{ matrix.flavor }}
 
       - name: Upload prebuild (linux-${{ matrix.architecture }}-${{ matrix.flavor }})
         uses: actions/upload-artifact@v7
@@ -141,7 +141,7 @@ jobs:
 
       - name: Build with local.sh
         shell: sh
-        run: sh ./local.sh
+        run: export LIBOMP_ROOT=$(brew --prefix libomp) && sh ./local.sh
 
       - name: Upload prebuild (darwin-${{ matrix.architecture }})
         uses: actions/upload-artifact@v7
