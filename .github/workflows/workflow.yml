@@ -104,7 +104,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: linux-${{ matrix.architecture }}-${{ matrix.flavor }}
-          path: prebuilds/linux-${{ matrix.architecture }}
+          path: prebuilds
           retention-days: 1
 
   build-darwin:
@@ -150,7 +150,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: darwin-${{ matrix.architecture }}
-          path: prebuilds/darwin-${{ matrix.architecture }}/
+          path: prebuilds
           retention-days: 1
 
   build-windows-and-publish:
@@ -180,41 +180,53 @@ jobs:
         shell: sh
         run: export HOME=$(pwd) && sh ./local.sh
 
-      - name: Download linux (x64) prebuilds
+      - name: Download prebuild (linux-x64-musl)
         uses: actions/download-artifact@v8
         with:
-          name: linux-x64
-          path: ./prebuilds/linux-x64
+          name: linux-x64-musl
+          path: ./prebuilds
 
-      - name: Download linux (arm64) prebuilds
+      - name: Download prebuild (linux-x64-glibc)
         uses: actions/download-artifact@v8
         with:
-          name: linux-arm64
-          path: ./prebuilds/linux-arm64
+          name: linux-x64-glibc
+          path: ./prebuilds
 
-      - name: Download linux (s390x) prebuilds
+      - name: Download prebuild (linux-arm64-musl)
         uses: actions/download-artifact@v8
         with:
-          name: linux-s390x
-          path: ./prebuilds/linux-s390x
+          name: linux-arm64-glibc
+          path: ./prebuilds
 
-      - name: Download linux (ppc64) prebuild
+      - name: Download prebuild (linux-arm64-glibc)
         uses: actions/download-artifact@v8
         with:
-          name: linux-ppc64
-          path: ./prebuilds/linux-ppc64
+          name: linux-arm64-glibc
+          path: ./prebuilds
 
-      - name: Download darwin (x64) prebuild
+      - name: Download prebuild (linux-s390x-glibc)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-s390x-glibc
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-ppc64le-glibc)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-ppc64le
+          path: ./prebuilds
+
+      - name: Download prebuild (darwin-x64)
         uses: actions/download-artifact@v8
         with:
           name: darwin-x64
-          path: ./prebuilds/darwin-x64
+          path: ./prebuilds
 
-      - name: Download darwin (arm64) prebuild
+      - name: Download prebuild (darwin-arm64)
         uses: actions/download-artifact@v8
         with:
           name: darwin-arm64
-          path: ./prebuilds/darwin-arm64
+          path: ./prebuilds
 
       - name: Extract version from package.json
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
