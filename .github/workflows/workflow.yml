@@ -213,7 +213,7 @@ jobs:
       - name: Download prebuild (linux-ppc64le-glibc)
         uses: actions/download-artifact@v8
         with:
-          name: linux-ppc64le
+          name: linux-ppc64le-glibc
           path: ./prebuilds
 
       - name: Download prebuild (darwin-x64)
