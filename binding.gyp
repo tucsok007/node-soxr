@@ -18,7 +18,7 @@
           'soxr/src/soxr.c',
           'soxr/src/vr32.c',
         ],
-      'include_dirs': ['soxr/config', 'soxr/src'],
+      'include_dirs': ['soxr/config/default', 'soxr/src'],
       'dependencies': ["<!(node -p \"require('node-addon-api').targets\"):node_addon_api_except_all"],
       'cflags!': [ '-fno-exceptions'],
       'cflags_cc!': [ '-fno-exceptions' ],
@@ -46,6 +46,21 @@
           }
         }],
         ['OS=="mac" and target_arch=="arm64"', {
+          'sources!': [
+            'src/wrapper.cc',
+            'soxr/src/cr.c',
+            'soxr/src/cr32.c',
+            'soxr/src/cr64.c',
+            'soxr/src/data-io.c',
+            'soxr/src/dbesi0.c',
+            'soxr/src/fft4g32.c',
+            'soxr/src/fft4g64.c',
+            'soxr/src/filter.c',
+            'soxr/src/pffft32.c',
+            'soxr/src/soxr.c',
+            'soxr/src/vr32.c',
+          ],
+          'include_dirs!': ['soxr/config/darwin-arm64', 'soxr/src'],
           'xcode_settings+': {
             "ARCHS": ["arm64"]
           }
