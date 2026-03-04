@@ -53,13 +53,17 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
     this->outputSampleRate = outputSampleRate;
     this->numberOfChannels = numberOfChannels;
     this->soxrInstance = instance;
+    this->isDestroyed = false;
   } else {
+    this->isDestroyed = true;
     Napi::Error::New(info.Env(), "Error while initializing the native SoxR instance.").ThrowAsJavaScriptException();
   }
 };
 
 SoxrWrapper::~SoxrWrapper() {
-  soxr_delete(this->soxrInstance);
+  if(!this->isDestroyed) {
+    soxr_delete(this->soxrInstance);
+  }
 }
 
 Napi::Object SoxrWrapper::init(Napi::Env env, Napi::Object exports) {
@@ -129,7 +133,8 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
 }
 
 Napi::Value SoxrWrapper::destroy(const Napi::CallbackInfo &info) {
-  delete this;
+  soxr_delete(this->soxrInstance);
+  this->isDestroyed = true;
 
   return info.Env().Undefined();
 }

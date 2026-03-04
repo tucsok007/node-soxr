@@ -1,0 +1,268 @@
+name: Build, Test and Publish
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-windows-x64-and-test:
+    runs-on: windows-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - name: Install Python and MSVC via Chocolatey
+        run: |
+          choco install python -y
+          choco install visualstudio2026buildtools --includeOptional -y
+
+      - name: Setup Git Bash
+        run: |
+          echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: "c-cpp, javascript-typescript"
+          queries: security-and-quality
+
+      - name: Build with local.sh
+        shell: sh
+        run: sh ./local.sh
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          upload: partial
+
+      - name: Run unit tests
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 1
+          max_attempts: 3
+          command: npm run test
+
+      - name: Upload prebuild (windows-x64)
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-x64
+          path: prebuilds
+          retention-days: 1
+
+      - name: Upload JS/TS builds
+        uses: actions/upload-artifact@v7
+        with:
+          name: tsc-dist
+          path: |
+            node-soxr.d.ts
+            node-soxr.js
+
+  build-linux:
+    strategy:
+      matrix:
+        architecture: [x64, arm64, s390x, ppc64le]
+        flavor: [musl, glibc]
+        exclude:
+          - architecture: ppc64le
+            flavor: musl
+          #Had to temporarily remove prebuild support due to a QEMU bug with how s390x handles alpine npm
+          - architecture: s390x
+            flavor: musl
+    runs-on: ubuntu-latest
+    needs: build-windows-x64-and-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - name: Setup Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "debug": true,
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build with docker-ci.sh
+        shell: bash
+        run: bash ./docker-ci.sh linux/${{ matrix.architecture }} ${{ matrix.flavor }}
+
+      - name: Upload prebuild (linux-${{ matrix.architecture }}-${{ matrix.flavor }})
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-${{ matrix.architecture }}-${{ matrix.flavor }}
+          path: prebuilds
+          retention-days: 1
+
+  build-darwin:
+    strategy:
+      matrix:
+        os: [macos-26-intel, macos-26]
+        architecture: [x64, arm64]
+        exclude:
+          - os: macos-26-intel
+            architecture: arm64
+          - os: macos-26
+            architecture: x64
+    runs-on: ${{ matrix.os }}
+    needs: build-windows-x64-and-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          architecture: ${{ matrix.architecture }}
+          cache: "npm"
+
+      - name: Setup Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install LLVM and OpenMP via Homebrew
+        run: |
+          brew install llvm
+          brew install libomp
+
+      - name: Install Python via Homebrew
+        run: brew install python
+
+      - name: Build with local.sh
+        shell: sh
+        run: export LIBOMP_ROOT=$(brew --prefix libomp) && sh ./local.sh
+
+      - name: Upload prebuild (darwin-${{ matrix.architecture }})
+        uses: actions/upload-artifact@v7
+        with:
+          name: darwin-${{ matrix.architecture }}
+          path: prebuilds
+          retention-days: 1
+
+  publish:
+    runs-on: windows-latest
+    needs: [build-linux, build-darwin]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - name: Setup Git Bash
+        run: |
+          echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Download JS/TS builds
+        uses: actions/download-artifact@v8
+        with:
+          name: tsc-dist
+          path: ./
+
+      - name: Download prebuild (windows-x64)
+        uses: actions/download-artifact@v8
+        with:
+          name: windows-x64
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-x64-musl)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-x64-musl
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-x64-glibc)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-x64-glibc
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-arm64-musl)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-arm64-glibc
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-arm64-glibc)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-arm64-glibc
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-s390x-glibc)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-s390x-glibc
+          path: ./prebuilds
+
+      - name: Download prebuild (linux-ppc64le-glibc)
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-ppc64le-glibc
+          path: ./prebuilds
+
+      - name: Download prebuild (darwin-x64)
+        uses: actions/download-artifact@v8
+        with:
+          name: darwin-x64
+          path: ./prebuilds
+
+      - name: Download prebuild (darwin-arm64)
+        uses: actions/download-artifact@v8
+        with:
+          name: darwin-arm64
+          path: ./prebuilds
+
+      - name: Extract version from package.json
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: |
+          echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Create Git tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "v${{ env.PACKAGE_VERSION }}" -m "Release v${{ env.PACKAGE_VERSION }}"
+          git push origin "v${{ env.PACKAGE_VERSION }}"
+
+      - name: Dry publish
+        if: github.ref != 'refs/heads/main' && success()
+        run: npm publish --dry-run
+
+      - name: Publish to npm
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: npm publish

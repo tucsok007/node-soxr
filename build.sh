@@ -1,15 +1,21 @@
 #!/bin/sh
+set -e
+
+should_pack=false
+should_cleanup=false
+skip_local_build=false
 
 usage() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
-  echo " -h, --help     Display this help message."
-  echo " -c, --cleanup  Cleanup files after build."
-  echo " -p, --pack     Pack the output into an npm package."
+  echo " -h, --help         Display this help message."
+  echo " -c, --cleanup      Cleanup files after build."
+  echo " -p, --pack         Pack the output into an npm package."
+  echo " -sl, --skip-local  Skip building binaries on the local machine (only Docker targets will be built)."
 }
 
 cleanup() {
-  ./cleanup.sh
+  sh ./cleanup.sh
 }
 
 build() {
@@ -17,7 +23,7 @@ build() {
   cleanup
 
   echo 'Setting up Docker buildx env...';
-  set DOCKER_BUILDKIT=1
+  export DOCKER_BUILDKIT=1
 
   echo 'Installing dependencies...';
   npm run install-ci
@@ -25,7 +31,9 @@ build() {
   echo 'Building...';
   docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/amd64,linux/arm64,linux/s390x --target exporter --output type=local,dest=./output .
   docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --target exporter --output type=local,dest=./output .
-  npx prebuildify --napi --tag-libc
+  if [ "$skip_local_build" = false ] ; then
+    npx prebuildify --napi --tag-libc
+  fi
 
   echo 'Re-organizing build output...';
   mkdir prebuilds
@@ -45,9 +53,6 @@ pack() {
   npm pack
 }
 
-should_pack=false
-should_cleanup=false
-
 handle_options() {
   while [ $# -gt 0 ]; do
     case $1 in
@@ -60,6 +65,9 @@ handle_options() {
         ;;
       -p | --pack)
         should_pack=true
+        ;;
+      -sl | --skip-local)
+        skip_local_build=true
         ;;
       *)
         echo "Invalid option: $1" >&2

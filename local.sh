@@ -1,3 +1,6 @@
+#!/bin/sh
+set -e
+
 echo 'Installing dependencies...';
 npm run install-ci
 

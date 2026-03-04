@@ -25,7 +25,13 @@ Node.js native addon wrapper for libsoxr (high quality and high performance offl
    npm i node-soxr
    ```
 
-   **_Note: the npm package includes pre-built binaries for Linux (incl. builds for all architectures supported by LTS Node.js), Alpine containers (all Node.js LTS supported architectures), and Windows (x64 only). For different operating systems and architectures (ex. darwin - MacOS) please make sure to install the necessary build tools on your system so the corresponding binaries can be built on your system at install time. If the required build tools are missing install will fail._**
+   **_Note: the npm package includes pre-built binaries for:_**
+   - Linux (incl. builds for all architectures supported by LTS Node.js - based on glibc),
+   - Alpine containers (all Node.js LTS supported architectures except s390x - can be built manually via running build.sh - based on musl),
+   - Windows (x64 only),
+   - and MacOS (x64, arm64 - without SIMD support).
+
+   **_For different operating systems and architectures (ex. Windows - arm64): please make sure to install the necessary build tools on your system so the corresponding binaries can be built on your system at install time - if the required build tools are missing install will fail._**
 
 ## Usage:
 
@@ -79,7 +85,7 @@ const outputData = NodeSoxr.deinterleaveChannelData(
 soxr.destroy();
 ```
 
-[You can find an in depth example regarding how you can utilize the library in a real-world scenario here.](examples/example.ts)
+[For more extensive examples please click here.](examples/)
 
 ###### At the moment only CBR resampling is supported. (This might not change.)
 
@@ -90,7 +96,7 @@ To build the library you may run `npm run build`, or use the provided shell scri
 #### Dependencies:
 
 - Python3
-- C/C++ build tools (installing through the Node.js installer is recommmended)
+- C/C++ build tools (installing through the Node.js installer is recommended)
 - An OpenMP runtime:
   - on Windows it's shipped with MSVC,
   - on Mac please use `brew install libomp`,

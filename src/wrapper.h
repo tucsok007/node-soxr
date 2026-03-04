@@ -17,6 +17,7 @@ class SoxrWrapper : public Napi::ObjectWrap<SoxrWrapper> {
     double outputSampleRate;
     uint32_t numberOfChannels;
     uint32_t maximumNumberOfThreads;
+    bool isDestroyed;
   public:
     SoxrWrapper(const Napi::CallbackInfo &info);
     ~SoxrWrapper();
