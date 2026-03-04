@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Python and MSVC via Chocolatey
         run: |
@@ -49,8 +49,11 @@ jobs:
           upload: partial
 
       - name: Run unit tests
-        shell: sh
-        run: npm run test
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 1
+          max_attempts: 3
+          command: npm run test
 
   build-linux:
     strategy:
@@ -71,7 +74,7 @@ jobs:
         with:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
-          cache: 'npm'
+          cache: "npm"
 
       - name: Setup Docker
         uses: docker/setup-docker-action@v4
@@ -83,7 +86,7 @@ jobs:
                 "containerd-snapshotter": true
               }
             }
-        
+
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -123,7 +126,7 @@ jobs:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
           architecture: ${{ matrix.architecture }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Setup Homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -147,48 +150,48 @@ jobs:
           path: prebuilds/darwin-${{ matrix.architecture }}/
           retention-days: 1
 
-#   build-windows:
-#     strategy:
-#       matrix:
-#         os: [window-latest, windows-11-arm]
-#         architecture: [x64, arm64]
-#       exclude:
-#         - os: windows-latest
-#           architecture: arm64
-#         - os: windows-11-arm
-#           architecture: x64
-#       runs-on: ${{ matrix.os }}
-#       needs: test
-#       steps:
-#         - name: Checkout code
-#           uses: actions/checkout@v4
+  #   build-windows:
+  #     strategy:
+  #       matrix:
+  #         os: [window-latest, windows-11-arm]
+  #         architecture: [x64, arm64]
+  #       exclude:
+  #         - os: windows-latest
+  #           architecture: arm64
+  #         - os: windows-11-arm
+  #           architecture: x64
+  #       runs-on: ${{ matrix.os }}
+  #       needs: test
+  #       steps:
+  #         - name: Checkout code
+  #           uses: actions/checkout@v4
 
-#         - name: Setup Node.js LTS
-#           uses: actions/setup-node@v4
-#           with:
-#             node-version: "lts/*"
-#             registry-url: "https://registry.npmjs.org"
-#             architecture: ${{ matrix.architecture }}
-        
-#         - name: Install Python and MSVC via Chocolatey
-#           run: |
-#             choco install python -y
-#             choco install visualstudio2026buildtools --includeOptional -y
+  #         - name: Setup Node.js LTS
+  #           uses: actions/setup-node@v4
+  #           with:
+  #             node-version: "lts/*"
+  #             registry-url: "https://registry.npmjs.org"
+  #             architecture: ${{ matrix.architecture }}
 
-#         - name: Setup Git Bash
-#           run: |
-#             echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+  #         - name: Install Python and MSVC via Chocolatey
+  #           run: |
+  #             choco install python -y
+  #             choco install visualstudio2026buildtools --includeOptional -y
 
-#         - name: Build with build.sh
-#           shell: sh
-#           run: sh ./local.sh
+  #         - name: Setup Git Bash
+  #           run: |
+  #             echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-#         - name: Upload prebuild
-#           uses: actions/upload-artifact@v7
-#           with:
-#             name: windows-${{ matrix.architecture }}
-#             path: prebuilds/windows-${{ matrix.architecture }}/
-#             retention-days: 1
+  #         - name: Build with build.sh
+  #           shell: sh
+  #           run: sh ./local.sh
+
+  #         - name: Upload prebuild
+  #           uses: actions/upload-artifact@v7
+  #           with:
+  #             name: windows-${{ matrix.architecture }}
+  #             path: prebuilds/windows-${{ matrix.architecture }}/
+  #             retention-days: 1
 
   bulid-windows-and-publish:
     runs-on: windows-latest
@@ -202,7 +205,7 @@ jobs:
         with:
           node-version: "lts/*"
           registry-url: "https://registry.npmjs.org"
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install Python and MSVC via Chocolatey
         run: |

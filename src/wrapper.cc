@@ -55,6 +55,7 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
     this->soxrInstance = instance;
     this->isDestroyed = false;
   } else {
+    this->isDestroyed = true;
     Napi::Error::New(info.Env(), "Error while initializing the native SoxR instance.").ThrowAsJavaScriptException();
   }
 };
