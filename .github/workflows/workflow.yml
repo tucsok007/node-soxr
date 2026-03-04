@@ -252,6 +252,7 @@ jobs:
 
       - name: Extract version from package.json
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        shell: sh
         run: |
           echo "PACKAGE_VERSION=$(grep '"version"' package.json | head -1 | grep -oP '(?<="version": ")[^"]*')" >> $GITHUB_ENV
 
