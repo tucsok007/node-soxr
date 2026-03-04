@@ -8,9 +8,6 @@ platform=""
 flavor="glibc"
 
 build() {
-  echo 'Removing previous build files (if they exist)...';
-  cleanup
-
   echo 'Setting up Docker buildx env...';
   export DOCKER_BUILDKIT=1
 

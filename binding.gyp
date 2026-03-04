@@ -40,9 +40,14 @@
           'cflags_cc+': ['-Xpreprocessor'],
           'include_dirs+': ["$(LIBOMP_ROOT)/include"],
           'libraries': ["-lomp", "-L$(LIBOMP_ROOT)/lib"],
-          'xcode_settings': {
+          'xcode_settings+': {
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
             'OTHER_CFLAGS': ["-Xpreprocessor", "-fopenmp"]
+          }
+        }],
+        ['OS=="mac" and target_arch=="arm64"', {
+          'xcode_settings+': {
+            "ARCHS": ["arm64"]
           }
         }],
         ['OS=="linux"', {
