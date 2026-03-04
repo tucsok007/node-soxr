@@ -259,9 +259,10 @@ jobs:
           git tag -a "v${{ env.PACKAGE_VERSION }}" -m "Release v${{ env.PACKAGE_VERSION }}"
           git push origin "v${{ env.PACKAGE_VERSION }}"
 
+      - name: Dry publish
+        if: github.ref != 'refs/heads/main' && success()
+        run: npm publish --dry-run
+
       - name: Publish to npm
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         run: npm publish
-
-      - name: Dry publish
-        run: npm publish --dry-run
