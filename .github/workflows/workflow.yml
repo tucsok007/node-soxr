@@ -53,6 +53,13 @@ jobs:
         run: npm run test
 
   build-linux:
+    strategy:
+      matrix:
+        architecture: [amd64, arm64, s390x, ppc64le]
+        flavor: [musl, glibc]
+        exclude:
+          - architecture: ppc64le
+            flavor: musl
     runs-on: ubuntu-latest
     needs: test
     steps:
@@ -82,41 +89,16 @@ jobs:
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-config-inline: |
-            [worker.oci]
-            max-parallelism = 2
 
-      - name: Build with build.sh
+      - name: Build with docker-ci.sh
         shell: sh
-        run: sh ./build.sh -sl -sdb
+        run: sh ./docker-ci.sh linux/${{ matrix.architecture }} ${{ matrix.flavor }}
 
-      - name: Upload prebuilds (x64)
+      - name: Upload prebuild (linux-${{ matrix.architecture }}-${{ matrix.flavor }})
         uses: actions/upload-artifact@v7
         with:
-          name: linux-x64
-          path: prebuilds/linux-x64
-          retention-days: 1
-
-      - name: Upload prebuilds (arm64)
-        uses: actions/upload-artifact@v7
-        with:
-          name: linux-arm64
-          path: prebuilds/linux-arm64
-          retention-days: 1
-
-      - name: Upload prebuilds (s390x)
-        uses: actions/upload-artifact@v7
-        with:
-          name: linux-s390x
-          path: prebuilds/linux-s390x
-          retention-days: 1
-
-      - name: Upload prebuild (ppc64)
-        uses: actions/upload-artifact@v7
-        with:
-          name: linux-ppc64
-          path: prebuilds/linux-ppc64
+          name: linux-${{ matrix.architecture }}-${{ matrix.flavor }}
+          path: prebuilds/linux-${{ matrix.architecture }}
           retention-days: 1
 
   build-darwin:
@@ -158,7 +140,7 @@ jobs:
         shell: sh
         run: sh ./local.sh
 
-      - name: Upload prebuild
+      - name: Upload prebuild (darwin-${{ matrix.architecture }})
         uses: actions/upload-artifact@v7
         with:
           name: darwin-${{ matrix.architecture }}

@@ -3,7 +3,6 @@
 should_pack=false
 should_cleanup=false
 skip_local_build=false
-separate_docker_builds=false
 
 usage() {
   echo "Usage: $0 [OPTIONS]"
@@ -29,18 +28,8 @@ build() {
   npm run install-ci
 
   echo 'Building...';
-  if [ "$separate_docker_builds" = true ] ; then
-    docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/amd64 --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/arm64 --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/s390x --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/amd64 --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/arm64 --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/ppc64le --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/s390x --target exporter --output type=local,dest=./output .
-  else
-    docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/amd64,linux/arm64,linux/s390x --target exporter --output type=local,dest=./output .
-    docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --target exporter --output type=local,dest=./output .
-  fi
+  docker build -t node-soxr-linux-musl -f targets/linux-musl.dockerfile --platform linux/amd64,linux/arm64,linux/s390x --target exporter --output type=local,dest=./output .
+  docker build -t node-soxr-linux -f targets/linux.dockerfile --build-arg PLATFORM=linux --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --target exporter --output type=local,dest=./output .
   if [ "$skip_local_build" = false ] ; then
     npx prebuildify --napi --tag-libc
   fi
@@ -78,9 +67,6 @@ handle_options() {
         ;;
       -sl | --skip-local)
         skip_local_build=true
-        ;;
-      -sdb | --separate-docker-builds)
-        separate_docker_builds=true
         ;;
       *)
         echo "Invalid option: $1" >&2

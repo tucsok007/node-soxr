@@ -24,7 +24,6 @@
       'cflags_cc!': [ '-fno-exceptions' ],
       'cflags+': ['-Wno-error=implicit-function-declaration', '-fopenmp', '-fopenmp-simd', '-pthread'],
       'cflags_cc+': ['-fopenmp', '-fopenmp-simd', '-pthread'],
-      #'ldflags+': ['-fopenmp'],
       'xcode_settings': {
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'CLANG_CXX_LIBRARY': 'libc++',
@@ -37,6 +36,7 @@
       'conditions': [
         ['OS=="mac"', {
           'cflags+': ['-fvisibility=hidden', '-Xpreprocessor'],
+          'cflags_cc+': ['-Xpreprocessor']
           'libraries': ["-lomp"],
           'xcode_settings': {
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
