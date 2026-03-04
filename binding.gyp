@@ -46,7 +46,7 @@
           }
         }],
         ['OS=="mac" and target_arch=="arm64"', {
-          'sources!': [
+          'sources=': [
             'src/wrapper.cc',
             'soxr/src/cr.c',
             'soxr/src/cr32.c',
@@ -60,7 +60,7 @@
             'soxr/src/soxr.c',
             'soxr/src/vr32.c',
           ],
-          'include_dirs!': ['soxr/config/darwin-arm64', 'soxr/src'],
+          'include_dirs=': ['soxr/config/darwin-arm64', 'soxr/src'],
           'xcode_settings+': {
             "ARCHS": ["arm64"]
           }
