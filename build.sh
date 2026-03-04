@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 should_pack=false
 should_cleanup=false
@@ -14,7 +15,7 @@ usage() {
 }
 
 cleanup() {
-  ./cleanup.sh
+  sh ./cleanup.sh
 }
 
 build() {
