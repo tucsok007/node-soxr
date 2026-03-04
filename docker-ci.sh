@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 platforms=("linux/x64" "linux/arm64" "linux/s390x" "linux/ppc64le")
 flavors=("musl" "glibc")
