@@ -174,6 +174,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
+    environment: Publish
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -252,7 +253,7 @@ jobs:
       - name: Extract version from package.json
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         run: |
-          echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          echo "PACKAGE_VERSION=$(grep '"version"' package.json | head -1 | grep -oP '(?<="version": ")[^"]*')" >> $GITHUB_ENV
 
       - name: Create Git tag
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
