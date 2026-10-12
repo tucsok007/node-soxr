@@ -27,6 +27,10 @@ SoxrWrapper::SoxrWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Soxr
   double inputSampleRate = info[0].As<Napi::Number>().DoubleValue();
   double outputSampleRate = info[1].As<Napi::Number>().DoubleValue();
   uint32_t numberOfChannels = info[2].As<Napi::Number>().Uint32Value();
+  if(numberOfChannels < 1) {
+    Napi::RangeError::New(env, "The numberOfChannels argument must be at least 1.").ThrowAsJavaScriptException();
+    return;
+  }
   soxr_error_t error;
   soxr_io_spec_t const ioFormat = soxr_io_spec(SOXR_FLOAT32_I, SOXR_FLOAT32_I);
   soxr_quality_spec_t quality;
@@ -85,6 +89,11 @@ Napi::Object SoxrWrapper::init(Napi::Env env, Napi::Object exports) {
 Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   Napi::Env env = info.Env();
 
+  if(this->isDestroyed) {
+    Napi::Error::New(env, "This SoxrWrapper instance has already been destroyed.").ThrowAsJavaScriptException();
+    return env.Undefined();
+  }
+
   if(info.Length() < 1 || !isFloat32Array(env, info[0])) {
     Napi::TypeError::New(env, "The interleavedChannelData parameter should be a Float32Array.").ThrowAsJavaScriptException();
     return env.Undefined();
@@ -126,15 +135,18 @@ Napi::Value SoxrWrapper::resample(const Napi::CallbackInfo &info) {
   outputVector = std::vector<float>();
 
   if(error) {
-    Napi::Error::New(env, "A native error occurred while resampling the audio data.");
-  } else {
-    return output;
+    Napi::Error::New(env, "A native error occurred while resampling the audio data.").ThrowAsJavaScriptException();
+    return env.Undefined();
   }
+
+  return output;
 }
 
 Napi::Value SoxrWrapper::destroy(const Napi::CallbackInfo &info) {
-  soxr_delete(this->soxrInstance);
-  this->isDestroyed = true;
+  if(!this->isDestroyed) {
+    soxr_delete(this->soxrInstance);
+    this->isDestroyed = true;
+  }
 
   return info.Env().Undefined();
 }
